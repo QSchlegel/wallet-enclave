@@ -1,5 +1,11 @@
 # Architecture — Wallet Enclave
 
+## TL;DR
+- **Wallet Enclave** is a tiny, separate daemon that holds keys and enforces policy.
+- **OpenClaw/agent** is treated as untrusted-by-default.
+- OpenClaw talks to the enclave over **local-only** transport (loopback HTTP or unix socket).
+- The agent never sees mnemonics/private keys; it only gets **capabilities** (approved actions).
+
 ## Purpose
 The wallet enclave is a **separate, lightweight daemon** that exposes a local-only capabilities API around Mesh wallet.
 
@@ -40,24 +46,34 @@ The core goal is capability-based access:
 - `audit.jsonl` — append-only record of requests and decisions
 - `idempotency.jsonl` or small KV — dedupe of submit intents
 
-## Diagram
+## Diagram (Mermaid)
 
-```
-+--------------------+        local (unix sock / 127.0.0.1)        +---------------------------+
-|   OpenClaw Agent   |  ----------------------------------------> |       Wallet Enclave      |
-| (no secrets ever)  |                                            | (Mesh wrapper + policy)   |
-+--------------------+                                            +-------------+-------------+
-            |                                                                    |
-            |  search -> ids -> decrypt top-N                                    | Mesh SDK
-            v                                                                    v
-+--------------------+                                            +---------------------------+
-|   Mem Bank (raw)   |  <--- ciphertext chunks --- encrypt/decrypt|  Mnemonic in enclave/HSM  |
-| embeddings (plain) |                                            |  (never exported)         |
-+--------------------+                                            +---------------------------+
-            |
-            v
-+--------------------+
-|  Mem Vault (MD KG) |
-| curated + shared   |
-+--------------------+
+```mermaid
+flowchart LR
+  A[OpenClaw / Agent runtime\n(untrusted-by-default)]
+  E[Wallet Enclave daemon\n(trusted boundary)]
+  M[Mesh SDK / Chain RPC]
+
+  subgraph Files[Local files (operator-controlled)]
+    P[policy.json\nallowlist + caps]
+    L[audit.jsonl\nappend-only]
+    I[idempotency store\ndedupe submits]
+  end
+
+  A -- "local-only HTTP (127.0.0.1)\nor unix socket" --> E
+  E --> M
+
+  E --- P
+  E --- L
+  E --- I
+
+  note right of A
+    No mnemonic/private keys.
+    Requests capabilities only.
+  end
+
+  note right of E
+    Holds mnemonic/HSM handle.
+    Enforces policy + logs.
+  end
 ```
