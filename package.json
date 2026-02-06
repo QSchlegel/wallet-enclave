@@ -1,0 +1,35 @@
+{
+  "name": "@qschlegel/wallet-enclave",
+  "version": "0.0.1",
+  "description": "Secure capabilities API wrapper around Mesh wallet (no secrets in agent process).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "mesh",
+    "wallet",
+    "enclave",
+    "cardano",
+    "bitcoin"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5"
+  }
+}
