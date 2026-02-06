@@ -33,5 +33,9 @@ The enclave runs locally (loopback / unix socket) and implements:
 +--------------------+
 ```
 
+## Docs
+- Architecture: `docs/ARCHITECTURE.md`
+- API (v1): `docs/API.md`
+
 ## Status
-Scaffold only (no implementation yet).
+MVP skeleton in progress (policy/audit/idempotency/stubs).
