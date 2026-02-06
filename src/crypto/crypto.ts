@@ -12,7 +12,7 @@ function masterSecret(): Buffer {
 
 export function deriveKey(context: string): Buffer {
   const salt = Buffer.from("wallet-enclave-hkdf-salt", "utf-8");
-  return crypto.hkdfSync("sha256", masterSecret(), salt, Buffer.from(context, "utf-8"), 32);
+  return Buffer.from(crypto.hkdfSync("sha256", masterSecret(), salt, Buffer.from(context, "utf-8"), 32));
 }
 
 export function encrypt(context: string, plaintextB64: string) {
